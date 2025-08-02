@@ -3,17 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const addTaskBtn = document.getElementById('add-task-btn');
   const taskList = document.getElementById('task-list');
 
-  const getTasks = () => {
-    return JSON.parse(localStorage.getItem('tasks')) || [];
-  };
+  const getTasks = () => JSON.parse(localStorage.getItem('tasks')) || [];
 
-  const saveTasks = (tasks) => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  };
+  const saveTasks = (tasks) => localStorage.setItem('tasks', JSON.stringify(tasks));
 
   const renderTasks = () => {
     const tasks = getTasks();
-    taskList.innerHTML = ''; 
+    taskList.innerHTML = '';
 
     if (tasks.length === 0) {
       taskList.innerHTML = '<li class="no-tasks">No hay tareas pendientes.</li>';
@@ -23,10 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     tasks.forEach(task => {
       const li = document.createElement('li');
       li.className = 'task-item';
-      if (task.completed) {
-        li.classList.add('completed');
-      }
+      if (task.completed) li.classList.add('completed');
       li.dataset.id = task.id;
+
+      const taskContent = document.createElement('div');
+      taskContent.className = 'task-content';
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -35,19 +32,32 @@ document.addEventListener('DOMContentLoaded', () => {
       const span = document.createElement('span');
       span.textContent = task.title;
 
-      li.appendChild(checkbox);
-      li.appendChild(span);
+      taskContent.appendChild(checkbox);
+      taskContent.appendChild(span);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'X';
+
+      li.appendChild(taskContent);
+      li.appendChild(deleteBtn);
       taskList.appendChild(li);
     });
   };
 
   const addTask = () => {
     const taskTitle = taskInput.value.trim();
+
+    if (taskTitle === '') {
+      alert('Por favor, escribe una tarea.');
+      return; 
+    }
+
     const tasks = getTasks();
     const newTask = {
       id: Date.now(),
       title: taskTitle,
-      completed: false
+      completed: false,
     };
 
     tasks.push(newTask);
@@ -56,26 +66,34 @@ document.addEventListener('DOMContentLoaded', () => {
     taskInput.value = '';
   };
 
-  // --- NUEVA LÓGICA PARA COMPLETAR TAREA ---
   const toggleTaskComplete = (taskId) => {
     const tasks = getTasks();
-    // Buscamos la tarea por su ID y cambiamos su estado 'completed'
-    const newTasks = tasks.map(task => {
-      if (task.id === taskId) {
-        return { ...task, completed: !task.completed };
-      }
-      return task;
-    });
-
+    const newTasks = tasks.map(task =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
     saveTasks(newTasks);
     renderTasks();
   };
 
-  // Usamos delegación de eventos para manejar los clics en los checkboxes
+  const deleteTask = (taskId) => {
+    let tasks = getTasks();
+    tasks = tasks.filter(task => task.id !== taskId);
+    saveTasks(tasks);
+    renderTasks();
+  };
+
   taskList.addEventListener('click', (event) => {
-    if (event.target.type === 'checkbox') {
-      const taskId = Number(event.target.parentElement.dataset.id);
+    const target = event.target;
+    const parentLi = target.closest('.task-item');
+
+    if (!parentLi) return;
+
+    const taskId = Number(parentLi.dataset.id);
+
+    if (target.type === 'checkbox') {
       toggleTaskComplete(taskId);
+    } else if (target.matches('.delete-btn')) {
+      deleteTask(taskId);
     }
   });
 
