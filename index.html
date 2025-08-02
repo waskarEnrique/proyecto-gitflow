@@ -2,11 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proyecto CRUD con Git Flow</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Lista de Tareas</h1>
+  <div class="container">
+    <h1>Lista de Tareas</h1>
+    <div class="input-area">
+      <input type="text" id="task-input" placeholder="Añadir nueva tarea...">
+      <button id="add-task-btn">Agregar</button>
+    </div>
+    <ul id="task-list">
+      </ul>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
