@@ -48,11 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const addTask = () => {
     const taskTitle = taskInput.value.trim();
 
-    // --- CORRECCIÓN CLAVE ---
-    // Verificamos que el título no esté vacío antes de agregar.
     if (taskTitle === '') {
       alert('Por favor, escribe una tarea.');
-      return; // Detiene la ejecución si no hay texto
+      return; 
     }
 
     const tasks = getTasks();
