@@ -11,7 +11,7 @@ body {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 4px_12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   width: 90%;
   max-width: 500px;
 }
@@ -54,38 +54,30 @@ h1 {
   color: #606770;
   padding: 1rem;
 }
-
 .task-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem;
   background-color: #f7f7f7;
   border-radius: 6px;
   margin-bottom: 0.5rem;
-  /* Modificación para alinear el botón de borrar */
-  justify-content: space-between;
 }
-
-/* Contenedor para el checkbox y el texto */
 .task-content {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-
 .task-item.completed span {
   text-decoration: line-through;
   color: #8d949e;
 }
-
 .task-item input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
 }
-
-/* NUEVO estilo para el botón de borrar */
 .delete-btn {
   background-color: #fa3e3e;
   color: white;
@@ -96,7 +88,6 @@ h1 {
   font-weight: bold;
   transition: background-color 0.2s;
 }
-
 .delete-btn:hover {
   background-color: #e03030;
 }

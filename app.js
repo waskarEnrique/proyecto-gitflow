@@ -3,17 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const addTaskBtn = document.getElementById('add-task-btn');
   const taskList = document.getElementById('task-list');
 
-  const getTasks = () => {
-    return JSON.parse(localStorage.getItem('tasks')) || [];
-  };
+  const getTasks = () => JSON.parse(localStorage.getItem('tasks')) || [];
 
-  const saveTasks = (tasks) => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  };
+  const saveTasks = (tasks) => localStorage.setItem('tasks', JSON.stringify(tasks));
 
   const renderTasks = () => {
     const tasks = getTasks();
-    taskList.innerHTML = ''; 
+    taskList.innerHTML = '';
 
     if (tasks.length === 0) {
       taskList.innerHTML = '<li class="no-tasks">No hay tareas pendientes.</li>';
@@ -23,9 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tasks.forEach(task => {
       const li = document.createElement('li');
       li.className = 'task-item';
-      if (task.completed) {
-        li.classList.add('completed');
-      }
+      if (task.completed) li.classList.add('completed');
       li.dataset.id = task.id;
 
       const taskContent = document.createElement('div');
@@ -41,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       taskContent.appendChild(checkbox);
       taskContent.appendChild(span);
 
-      // --- NUEVO BOTÓN DE BORRAR ---
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'delete-btn';
       deleteBtn.textContent = 'X';
@@ -54,12 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const addTask = () => {
     const taskTitle = taskInput.value.trim();
+
+    // --- CORRECCIÓN CLAVE ---
+    // Verificamos que el título no esté vacío antes de agregar.
+    if (taskTitle === '') {
+      alert('Por favor, escribe una tarea.');
+      return; // Detiene la ejecución si no hay texto
+    }
+
     const tasks = getTasks();
     const newTask = {
       id: Date.now(),
       title: taskTitle,
-      completed: false
+      completed: false,
     };
+
     tasks.push(newTask);
     saveTasks(tasks);
     renderTasks();
@@ -68,14 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggleTaskComplete = (taskId) => {
     const tasks = getTasks();
-    const newTasks = tasks.map(task => 
+    const newTasks = tasks.map(task =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
     saveTasks(newTasks);
     renderTasks();
   };
 
-  // --- NUEVA LÓGICA PARA BORRAR TAREA ---
   const deleteTask = (taskId) => {
     let tasks = getTasks();
     tasks = tasks.filter(task => task.id !== taskId);
@@ -83,10 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
   };
 
-  // El event listener ahora maneja checkboxes Y botones de borrado
   taskList.addEventListener('click', (event) => {
     const target = event.target;
     const parentLi = target.closest('.task-item');
+
     if (!parentLi) return;
 
     const taskId = Number(parentLi.dataset.id);
