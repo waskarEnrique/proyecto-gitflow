@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Obtenemos los elementos del DOM
   const taskInput = document.getElementById('task-input');
   const addTaskBtn = document.getElementById('add-task-btn');
   const taskList = document.getElementById('task-list');
 
-  // --- FUNCIONES DE DATOS ---
   const getTasks = () => {
     return JSON.parse(localStorage.getItem('tasks')) || [];
   };
@@ -13,10 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   };
 
-  // --- FUNCIONES DE RENDERIZADO ---
   const renderTasks = () => {
     const tasks = getTasks();
-    taskList.innerHTML = ''; // Limpia la lista
+    taskList.innerHTML = ''; 
 
     if (tasks.length === 0) {
       taskList.innerHTML = '<li class="no-tasks">No hay tareas pendientes.</li>';
@@ -25,37 +22,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tasks.forEach(task => {
       const li = document.createElement('li');
-      li.textContent = task.title;
-      // Añadimos un data-id para poder identificar la tarea más adelante
+      li.className = 'task-item';
+      if (task.completed) {
+        li.classList.add('completed');
+      }
       li.dataset.id = task.id;
+
+      const taskContent = document.createElement('div');
+      taskContent.className = 'task-content';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.completed;
+
+      const span = document.createElement('span');
+      span.textContent = task.title;
+
+      taskContent.appendChild(checkbox);
+      taskContent.appendChild(span);
+
+      // --- NUEVO BOTÓN DE BORRAR ---
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'X';
+
+      li.appendChild(taskContent);
+      li.appendChild(deleteBtn);
       taskList.appendChild(li);
     });
   };
 
-  // --- LÓGICA PARA AÑADIR TAREAS ---
   const addTask = () => {
     const taskTitle = taskInput.value.trim();
-
-    // (Dejaremos la validación de texto vacío para un futuro hotfix)
-
     const tasks = getTasks();
-
     const newTask = {
-      id: Date.now(), // Usamos un timestamp como ID único
+      id: Date.now(),
       title: taskTitle,
       completed: false
     };
-
     tasks.push(newTask);
     saveTasks(tasks);
-    renderTasks(); // Volvemos a pintar la lista actualizada
-
-    taskInput.value = ''; // Limpiamos el input
+    renderTasks();
+    taskInput.value = '';
   };
 
-  // --- EVENT LISTENERS ---
-  addTaskBtn.addEventListener('click', addTask);
+  const toggleTaskComplete = (taskId) => {
+    const tasks = getTasks();
+    const newTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
+    saveTasks(newTasks);
+    renderTasks();
+  };
 
-  // --- EJECUCIÓN INICIAL ---
+  // --- NUEVA LÓGICA PARA BORRAR TAREA ---
+  const deleteTask = (taskId) => {
+    let tasks = getTasks();
+    tasks = tasks.filter(task => task.id !== taskId);
+    saveTasks(tasks);
+    renderTasks();
+  };
+
+  // El event listener ahora maneja checkboxes Y botones de borrado
+  taskList.addEventListener('click', (event) => {
+    const target = event.target;
+    const parentLi = target.closest('.task-item');
+    if (!parentLi) return;
+
+    const taskId = Number(parentLi.dataset.id);
+
+    if (target.type === 'checkbox') {
+      toggleTaskComplete(taskId);
+    } else if (target.matches('.delete-btn')) {
+      deleteTask(taskId);
+    }
+  });
+
+  addTaskBtn.addEventListener('click', addTask);
   renderTasks();
 });
