@@ -1,93 +1,80 @@
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-.container {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  width: 90%;
-  max-width: 500px;
-}
-h1 {
-  text-align: center;
-  color: #1c1e21;
-}
-.input-area {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-#task-input {
-  flex-grow: 1;
-  padding: 0.75rem;
-  border: 1px solid #dddfe2;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-#add-task-btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #1877f2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-#add-task-btn:hover {
-  background-color: #166fe5;
-}
-#task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.no-tasks {
-  text-align: center;
-  color: #606770;
-  padding: 1rem;
-}
-.task-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem;
-  background-color: #f7f7f7;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-}
-.task-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.task-item.completed span {
-  text-decoration: line-through;
-  color: #8d949e;
-}
-.task-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-.delete-btn {
-  background-color: #fa3e3e;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.3rem 0.7rem;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-.delete-btn:hover {
-  background-color: #e03030;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const taskInput = document.getElementById('task-input');
+  const addTaskBtn = document.getElementById('add-task-btn');
+  const taskList = document.getElementById('task-list');
+
+  const getTasks = () => JSON.parse(localStorage.getItem('tasks')) || [];
+
+  const saveTasks = (tasks) => localStorage.setItem('tasks', JSON.stringify(tasks));
+
+  const renderTasks = () => {
+    const tasks = getTasks();
+    taskList.innerHTML = '';
+
+    if (tasks.length === 0) {
+      taskList.innerHTML = '<li class="no-tasks">No hay tareas pendientes.</li>';
+      return;
+    }
+
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = 'task-item';
+      if (task.completed) li.classList.add('completed');
+      li.dataset.id = task.id;
+
+      const taskContent = document.createElement('div');
+      taskContent.className = 'task-content';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.completed;
+
+      const span = document.createElement('span');
+      span.textContent = task.title;
+
+      taskContent.appendChild(checkbox);
+      taskContent.appendChild(span);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'X';
+
+      li.appendChild(taskContent);
+      li.appendChild(deleteBtn);
+      taskList.appendChild(li);
+    });
+  };
+
+  const addTask = () => {
+    const taskTitle = taskInput.value.trim();
+
+    if (taskTitle === '') {
+      alert('Por favor, escribe una tarea.');
+      return; 
+    }
+
+    const tasks = getTasks();
+    const newTask = {
+      id: Date.now(),
+      title: taskTitle,
+      completed: false,
+    };
+
+    tasks.push(newTask);
+    saveTasks(tasks);
+    renderTasks();
+    taskInput.value = '';
+  };
+
+  const toggleTaskComplete = (taskId) => {
+    const tasks = getTasks();
+    const newTasks = tasks.map(task =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
+    saveTasks(newTasks);
+    renderTasks();
+  };
+
+  const deleteTask = (taskId) => {
+    let tasks = getTasks();
+    tasks = tasks.filter(task => task
