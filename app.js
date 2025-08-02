@@ -47,21 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const addTask = () => {
     const taskTitle = taskInput.value.trim();
-
-    // --- CORRECCIÓN CLAVE ---
-    // Verificamos que el título no esté vacío antes de agregar.
     if (taskTitle === '') {
       alert('Por favor, escribe una tarea.');
-      return; // Detiene la ejecución si no hay texto
+      return; 
     }
 
     const tasks = getTasks();
-    const newTask = {
-      id: Date.now(),
-      title: taskTitle,
-      completed: false,
-    };
-
+    const newTask = { id: Date.now(), title: taskTitle, completed: false };
     tasks.push(newTask);
     saveTasks(tasks);
     renderTasks();
@@ -77,19 +69,23 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
   };
 
+  // --- CÓDIGO MODIFICADO ---
   const deleteTask = (taskId) => {
-    let tasks = getTasks();
-    tasks = tasks.filter(task => task.id !== taskId);
-    saveTasks(tasks);
-    renderTasks();
+    // Añadimos una confirmación antes de borrar
+    const isConfirmed = confirm('¿Estás seguro de que quieres borrar esta tarea?');
+
+    if (isConfirmed) {
+      let tasks = getTasks();
+      tasks = tasks.filter(task => task.id !== taskId);
+      saveTasks(tasks);
+      renderTasks();
+    }
   };
 
   taskList.addEventListener('click', (event) => {
     const target = event.target;
     const parentLi = target.closest('.task-item');
-
     if (!parentLi) return;
-
     const taskId = Number(parentLi.dataset.id);
 
     if (target.type === 'checkbox') {
