@@ -54,7 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const tasks = getTasks();
-    const newTask = { id: Date.now(), title: taskTitle, completed: false };
+    const newTask = {
+      id: Date.now(),
+      title: taskTitle,
+      completed: false,
+    };
+
     tasks.push(newTask);
     saveTasks(tasks);
     renderTasks();
@@ -70,11 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
   };
 
-  // --- CÓDIGO MODIFICADO ---
   const deleteTask = (taskId) => {
-    // Añadimos una confirmación antes de borrar
     const isConfirmed = confirm('¿Estás seguro de que quieres borrar esta tarea?');
-
+    
     if (isConfirmed) {
       let tasks = getTasks();
       tasks = tasks.filter(task => task.id !== taskId);
@@ -86,7 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
   taskList.addEventListener('click', (event) => {
     const target = event.target;
     const parentLi = target.closest('.task-item');
+
     if (!parentLi) return;
+
     const taskId = Number(parentLi.dataset.id);
 
     if (target.type === 'checkbox') {
